@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Estilos personalizados opcionales */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  @apply bg-white text-black;
+}
+
+button {
+  @apply rounded-lg border border-transparent px-4 py-2 text-base font-medium bg-gray-800 text-white hover:border-blue-500 focus:outline-none;
+}
