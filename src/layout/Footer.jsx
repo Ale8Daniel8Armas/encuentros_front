@@ -6,9 +6,12 @@ const Footer = () => {
       <div className="border-b border-white/20 flex flex-wrap justify-between items-center px-8 h-40">
         <div className="flex flex-1 items-center justify-between px-6">
           <div className="flex flex-grow justify-center items-center">
-            <a href="#" className="hover:underline text-2xl whitespace-nowrap">
+            <Link
+              to="/entradas"
+              className="hover:underline text-2xl whitespace-nowrap"
+            >
               Historial de compras
-            </a>
+            </Link>
           </div>
 
           <span className="hidden sm:inline-block h-40 border-r border-white/30" />

@@ -1,12 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaSearch, FaShoppingCart } from "react-icons/fa";
-import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
+  const [usuario, setUsuario] = useState(null);
+
+  useEffect(() => {
+    const fetchUsuario = async () => {
+      try {
+        const response = await fetch("http://localhost:3001/usuario/me", {
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUsuario(data);
+        } else {
+          setUsuario(null);
+        }
+      } catch (error) {
+        console.error("Error al obtener usuario:", error);
+        setUsuario(null);
+      }
+    };
+
+    fetchUsuario();
+  }, []);
+
   return (
     <div className="flex w-full shadow-md bg-red-600 h-16 min-h-[110px]">
       {/* Logo */}
-
       <div className="bg-white flex items-center justify-center px-10 min-w-[150px]">
         <Link to="/homepage">
           <img
@@ -32,17 +55,23 @@ const Navbar = () => {
           <FaSearch className="text-gray-600 text-lg" />
         </div>
 
-        {/* Login, registro, carrito */}
+        {/* Login, registro o nombre */}
         <div className="flex items-center gap-6 text-white text-lg font-semibold whitespace-nowrap">
           <Link to="/cart" className="cursor-pointer text-xl">
             <FaShoppingCart />
           </Link>
-          <Link to="/login" className="cursor-pointer">
-            Login
-          </Link>
-          <Link to="/register" className="cursor-pointer">
-            Registro
-          </Link>
+          {usuario ? (
+            <span>{usuario.nombres}</span>
+          ) : (
+            <>
+              <Link to="/login" className="cursor-pointer">
+                Login
+              </Link>
+              <Link to="/register" className="cursor-pointer">
+                Registro
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </div>

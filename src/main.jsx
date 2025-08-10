@@ -11,6 +11,7 @@ import StadiumTheme from "./Stadium.jsx";
 import CartTheme from "./CartContent.jsx";
 import EventTheme from "./Event.jsx";
 import ResultsTheme from "./Results.jsx";
+import EntradasTheme from "./Entradas.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -26,6 +27,7 @@ root.render(
       <Route path="/cart" element={<CartTheme />} />
       <Route path="/event/:id" element={<EventTheme />} />
       <Route path="/buscar" element={<ResultsTheme />} />
+      <Route path="/entradas" element={<EntradasTheme />} />
       {/* Ruta por defecto */}
       <Route path="*" element={<Navigate to="/homepage" replace />} />
     </Routes>

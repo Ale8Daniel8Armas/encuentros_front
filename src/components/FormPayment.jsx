@@ -7,9 +7,9 @@ const PaymentPage = () => {
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
   const navigate = useNavigate();
 
-  // Cargar datos completos de eventos según los IDs del carrito
   useEffect(() => {
     async function fetchEventos() {
       try {
@@ -20,7 +20,6 @@ const PaymentPage = () => {
           return;
         }
 
-        // Llamada a la API para traer datos completos de cada evento
         const responses = await Promise.all(
           ids.map((id) =>
             fetch(`http://localhost:3002/api/eventos/${id}`).then((res) =>
@@ -29,7 +28,6 @@ const PaymentPage = () => {
           )
         );
 
-        // Cruzar datos de API con cantidades pasadas por el carrito
         const mergedItems = responses.map((evento) => {
           const cartItem = passedCart.find((c) => c.id === evento.id);
           return {
@@ -61,6 +59,50 @@ const PaymentPage = () => {
   const iva = subtotal * 0.12;
   const total = subtotal + iva;
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setProcessing(true);
+
+    try {
+      const usuarioId = localStorage.getItem("usuarioId");
+      if (!usuarioId) throw new Error("Usuario no autenticado");
+
+      // Crear una entrada por cada cantidad (si quantity > 1, crear varias)
+      for (const item of cartItems) {
+        for (let i = 0; i < item.quantity; i++) {
+          // Genera un asiento random o asignado (aquí ejemplo simple)
+          const asiento = `Asiento-${Math.floor(Math.random() * 1000)}`;
+
+          const body = {
+            eventoId: item.id,
+            usuarioId,
+            asiento,
+          };
+
+          const response = await fetch("http://localhost:3002/api/entradas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `Error comprando entrada para evento ${item.titulo}`
+            );
+          }
+        }
+      }
+
+      localStorage.removeItem("cart");
+      navigate("/entradas");
+    } catch (error) {
+      console.error(error);
+      alert("Error al procesar la compra. Intente de nuevo.");
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   if (loading) {
     return <p className="text-center mt-10">Cargando resumen de compra...</p>;
   }
@@ -70,7 +112,7 @@ const PaymentPage = () => {
       <div className="text-center mt-10">
         <div className="flex flex-col items-center justify-center h-96 space-y-4">
           <p className="text-gray-500 text-lg font-semibold">
-            No hay eventos en el carrito
+            No hay eventos aún adquiridos
           </p>
           <Link
             to="/homepage"
@@ -103,13 +145,11 @@ const PaymentPage = () => {
         </Link>
       </div>
 
-      {/* Contenedor de columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Columna Izquierda: Datos de pago */}
+        {/* Formulario pago */}
         <div>
           <h2 className="font-bold mb-4 text-2xl">Datos de pago</h2>
-
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Nombre Titular */}
             <div>
               <label className="block text-sm font-medium mb-1">
@@ -168,12 +208,14 @@ const PaymentPage = () => {
               />
             </div>
 
-            {/* Botón */}
             <button
               type="submit"
-              className="w-full bg-green-900 text-white py-2 rounded-lg hover:bg-green-800 transition text-lg"
+              disabled={processing}
+              className={`w-full py-2 rounded-lg text-white text-lg ${
+                processing ? "bg-gray-400" : "bg-green-900 hover:bg-green-800"
+              }`}
             >
-              Continuar
+              {processing ? "Procesando..." : "Continuar"}
             </button>
           </form>
 
@@ -197,7 +239,7 @@ const PaymentPage = () => {
           </div>
         </div>
 
-        {/* Columna Derecha: Resumen */}
+        {/* Resumen compra */}
         <div>
           <h2 className="text-2xl font-bold mb-4">Resumen</h2>
           <div className="space-y-4">

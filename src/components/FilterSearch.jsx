@@ -6,14 +6,12 @@ const FilterSearch = () => {
   const navigate = useNavigate();
   const [tipoEvento, setTipoEvento] = useState("");
   const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
 
   const handleSearch = () => {
     // Si hay parámetros, construir la query string
     const params = new URLSearchParams();
     if (tipoEvento) params.append("tipo", tipoEvento);
     if (fechaInicio) params.append("inicio", fechaInicio);
-    if (fechaFin) params.append("fin", fechaFin);
 
     navigate(`/buscar?${params.toString()}`);
   };
@@ -40,17 +38,9 @@ const FilterSearch = () => {
 
         {/* Fecha de inicio */}
         <input
-          type="time"
+          type="date"
           value={fechaInicio}
           onChange={(e) => setFechaInicio(e.target.value)}
-          className="bg-black text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-800 transition-all duration-300"
-        />
-
-        {/* Fecha de fin */}
-        <input
-          type="time"
-          value={fechaFin}
-          onChange={(e) => setFechaFin(e.target.value)}
           className="bg-black text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-800 transition-all duration-300"
         />
 
