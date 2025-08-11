@@ -1,217 +1,162 @@
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardHeader,
   CardBody,
   Typography,
-  Avatar,
-  Chip,
-  Tooltip,
-  Progress,
+  Input,
+  Button,
 } from "@material-tailwind/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { authorsTableData, projectsTableData } from "@/data";
 
 export function Asistencia() {
+  const [asistencias, setAsistencias] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Formulario
+  const [eventoId, setEventoId] = useState("");
+  const [usuarioId, setUsuarioId] = useState("");
+  const [puerta, setPuerta] = useState("");
+  const [formLoading, setFormLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+
+  // Fetch asistencias
+  const fetchAsistencias = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("http://localhost:3004/asistencias");
+      if (!res.ok) throw new Error("Error al cargar asistencias");
+      const data = await res.json();
+      setAsistencias(data);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAsistencias();
+  }, []);
+
+  // Registrar asistencia manual
+  const handleRegistrar = async (e) => {
+    e.preventDefault();
+    if (!eventoId || !usuarioId || !puerta) {
+      setError("Por favor, completa todos los campos.");
+      return;
+    }
+
+    setFormLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("http://localhost:3004/asistencias", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventoId, usuarioId, puerta }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Error al registrar asistencia");
+      }
+
+      const nuevaAsistencia = await res.json();
+      setAsistencias([nuevaAsistencia, ...asistencias]);
+      setSuccessMsg("Asistencia registrada con éxito");
+      setEventoId("");
+      setUsuarioId("");
+      setPuerta("");
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
   return (
-    <div className="mt-12 mb-8 flex flex-col gap-12">
+    <div className="mt-12 mb-8 flex flex-col gap-12 max-w-7xl mx-auto">
       <Card>
-        <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
-          <Typography variant="h6" color="white">
-            Authors Table
+        <CardHeader variant="gradient" color="blue" className="mb-6 p-6">
+          <Typography variant="h5" color="white">
+            Registro Manual de Asistencia
           </Typography>
         </CardHeader>
-        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-          <table className="w-full min-w-[640px] table-auto">
-            <thead>
-              <tr>
-                {["author", "function", "status", "employed", ""].map((el) => (
-                  <th
-                    key={el}
-                    className="border-b border-blue-gray-50 py-3 px-5 text-left"
-                  >
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-bold uppercase text-blue-gray-400"
-                    >
-                      {el}
-                    </Typography>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {authorsTableData.map(
-                ({ img, name, email, job, online, date }, key) => {
-                  const className = `py-3 px-5 ${
-                    key === authorsTableData.length - 1
-                      ? ""
-                      : "border-b border-blue-gray-50"
-                  }`;
-
-                  return (
-                    <tr key={name}>
-                      <td className={className}>
-                        <div className="flex items-center gap-4">
-                          <Avatar src={img} alt={name} size="sm" variant="rounded" />
-                          <div>
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-semibold"
-                            >
-                              {name}
-                            </Typography>
-                            <Typography className="text-xs font-normal text-blue-gray-500">
-                              {email}
-                            </Typography>
-                          </div>
-                        </div>
-                      </td>
-                      <td className={className}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {job[0]}
-                        </Typography>
-                        <Typography className="text-xs font-normal text-blue-gray-500">
-                          {job[1]}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <Chip
-                          variant="gradient"
-                          color={online ? "green" : "blue-gray"}
-                          value={online ? "online" : "offline"}
-                          className="py-0.5 px-2 text-[11px] font-medium w-fit"
-                        />
-                      </td>
-                      <td className={className}>
-                        <Typography className="text-xs font-semibold text-blue-gray-600">
-                          {date}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <Typography
-                          as="a"
-                          href="#"
-                          className="text-xs font-semibold text-blue-gray-600"
-                        >
-                          Edit
-                        </Typography>
-                      </td>
-                    </tr>
-                  );
-                }
-              )}
-            </tbody>
-          </table>
+        <CardBody>
+          <form onSubmit={handleRegistrar} className="flex flex-col gap-4 max-w-md">
+            <Input
+              label="ID Evento"
+              value={eventoId}
+              onChange={(e) => setEventoId(e.target.value)}
+              required
+            />
+            <Input
+              label="ID Usuario"
+              value={usuarioId}
+              onChange={(e) => setUsuarioId(e.target.value)}
+              required
+            />
+            <Input
+              label="Puerta"
+              value={puerta}
+              onChange={(e) => setPuerta(e.target.value)}
+              required
+            />
+            <Button type="submit" disabled={formLoading} color="blue">
+              {formLoading ? "Registrando..." : "Registrar Asistencia"}
+            </Button>
+            {error && (
+              <Typography color="red" variant="small" className="mt-2">
+                {error}
+              </Typography>
+            )}
+          </form>
         </CardBody>
       </Card>
+
       <Card>
-        <CardHeader variant="gradient" color="gray" className="mb-8 p-6">
+        <CardHeader variant="gradient" color="gray" className="p-6">
           <Typography variant="h6" color="white">
-            Projects Table
+            Listado de Asistencias
           </Typography>
         </CardHeader>
-        <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-          <table className="w-full min-w-[640px] table-auto">
-            <thead>
-              <tr>
-                {["companies", "members", "budget", "completion", ""].map(
-                  (el) => (
+        <CardBody className="overflow-x-auto">
+          {loading ? (
+            <Typography>Cargando asistencias...</Typography>
+          ) : asistencias.length === 0 ? (
+            <Typography>No hay asistencias registradas.</Typography>
+          ) : (
+            <table className="w-full min-w-[640px] table-auto border-collapse border border-gray-200">
+              <thead>
+                <tr className="bg-gray-100">
+                  {["Evento ID", "Usuario ID", "Puerta", "Fecha y Hora"].map((h) => (
                     <th
-                      key={el}
-                      className="border-b border-blue-gray-50 py-3 px-5 text-left"
+                      key={h}
+                      className="border border-gray-300 py-2 px-4 text-left text-sm font-semibold text-gray-700"
                     >
-                      <Typography
-                        variant="small"
-                        className="text-[11px] font-bold uppercase text-blue-gray-400"
-                      >
-                        {el}
-                      </Typography>
+                      {h}
                     </th>
-                  )
-                )}
-              </tr>
-            </thead>
-            <tbody>
-              {projectsTableData.map(
-                ({ img, name, members, budget, completion }, key) => {
-                  const className = `py-3 px-5 ${
-                    key === projectsTableData.length - 1
-                      ? ""
-                      : "border-b border-blue-gray-50"
-                  }`;
-
-                  return (
-                    <tr key={name}>
-                      <td className={className}>
-                        <div className="flex items-center gap-4">
-                          <Avatar src={img} alt={name} size="sm" />
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-bold"
-                          >
-                            {name}
-                          </Typography>
-                        </div>
-                      </td>
-                      <td className={className}>
-                        {members.map(({ img, name }, key) => (
-                          <Tooltip key={name} content={name}>
-                            <Avatar
-                              src={img}
-                              alt={name}
-                              size="xs"
-                              variant="circular"
-                              className={`cursor-pointer border-2 border-white ${
-                                key === 0 ? "" : "-ml-2.5"
-                              }`}
-                            />
-                          </Tooltip>
-                        ))}
-                      </td>
-                      <td className={className}>
-                        <Typography
-                          variant="small"
-                          className="text-xs font-medium text-blue-gray-600"
-                        >
-                          {budget}
-                        </Typography>
-                      </td>
-                      <td className={className}>
-                        <div className="w-10/12">
-                          <Typography
-                            variant="small"
-                            className="mb-1 block text-xs font-medium text-blue-gray-600"
-                          >
-                            {completion}%
-                          </Typography>
-                          <Progress
-                            value={completion}
-                            variant="gradient"
-                            color={completion === 100 ? "green" : "gray"}
-                            className="h-1"
-                          />
-                        </div>
-                      </td>
-                      <td className={className}>
-                        <Typography
-                          as="a"
-                          href="#"
-                          className="text-xs font-semibold text-blue-gray-600"
-                        >
-                          <EllipsisVerticalIcon
-                            strokeWidth={2}
-                            className="h-5 w-5 text-inherit"
-                          />
-                        </Typography>
-                      </td>
-                    </tr>
-                  );
-                }
-              )}
-            </tbody>
-          </table>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {asistencias.map(({ evento_id, usuario_id, puerta, fecha_hora }, i) => (
+                  <tr
+                    key={i}
+                    className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                  >
+                    <td className="border border-gray-300 py-2 px-4">{evento_id}</td>
+                    <td className="border border-gray-300 py-2 px-4">{usuario_id}</td>
+                    <td className="border border-gray-300 py-2 px-4">{puerta}</td>
+                    <td className="border border-gray-300 py-2 px-4">
+                      {new Date(fecha_hora).toLocaleString()}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </CardBody>
       </Card>
     </div>
