@@ -1,4 +1,3 @@
-// src/pages/UsuariosD.jsx
 import React, { useEffect, useState } from "react";
 import {
   Card, CardHeader, CardBody, Typography, Avatar, Chip, Button, Dialog, DialogHeader,

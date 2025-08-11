@@ -8,7 +8,7 @@ import {
   CalendarDaysIcon,
   UsersIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Profile, Tables, Notificaciones, Asistencia, EntradasD, EventosD, UsuariosD } from "@/pages/dashboard";
+import { Home, Profile, Tables, Notificaciones, Asistencia, EntradasD, EventosD, UsuariosD } from "../src/pages/dashboard";
 
 const icon = {
   className: "w-5 h-5 text-inherit",

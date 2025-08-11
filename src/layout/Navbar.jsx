@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import BellNotifier from "../components/NotificationBell";
 
 const Navbar = () => {
   const [usuario, setUsuario] = useState(null);
@@ -57,6 +58,7 @@ const Navbar = () => {
 
         {/* Login, registro o nombre */}
         <div className="flex items-center gap-6 text-white text-lg font-semibold whitespace-nowrap">
+          <BellNotifier />
           <Link to="/cart" className="cursor-pointer text-xl">
             <FaShoppingCart />
           </Link>
