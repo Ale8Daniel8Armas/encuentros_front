@@ -16,6 +16,7 @@ import { EllipsisVerticalIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/o
 
 import ZonasPreciosForm from "../components/ZonasPrecioForm";
 
+//RUTA PARA CREAR EVENTOS
 const API_URL = "http://localhost:3002/eventos"; 
 
 export function EventosD() {
@@ -34,8 +35,9 @@ export function EventosD() {
     estado: "activo",
   });
 
-  // Obtener eventos
   const fetchEventos = async () => {
+
+    //OBTENER EVENTOS
     try {
       const { data } = await axios.get(API_URL);
       setEventos(data);
@@ -48,21 +50,50 @@ export function EventosD() {
     fetchEventos();
   }, []);
 
-  // Crear evento
-  const handleCrearEvento = async () => {
-    try {
-      const body = {
-        ...nuevoEvento,
-      };
-      await axios.post(API_URL, body);
-      setOpenModal(false);
-      fetchEventos();
-    } catch (error) {
-      console.error("Error creando evento", error);
-    }
-  };
+const handleCrearEvento = async () => {
+  if (!nuevoEvento.nombre.trim()) {
+    return alert("El nombre del evento es obligatorio");
+  }
+  if (!nuevoEvento.descripcion.trim()) {
+    return alert("La descripción es obligatoria");
+  }
+  if (!nuevoEvento.fecha) {
+    return alert("La fecha es obligatoria");
+  }
 
-  // Eliminar evento
+  const fechaEvento = new Date(nuevoEvento.fecha);
+  if (fechaEvento < new Date()) {
+    return alert("La fecha del evento debe ser futura");
+  }
+
+  if (!nuevoEvento.tipo.trim()) {
+    return alert("Selecciona un tipo de evento");
+  }
+
+  if (isNaN(nuevoEvento.quantity) || nuevoEvento.quantity <= 0) {
+    return alert("La cantidad de entradas debe ser un número positivo");
+  }
+
+  if (!nuevoEvento.precio || isNaN(parseFloat(nuevoEvento.precio)) || parseFloat(nuevoEvento.precio) <= 0) {
+    return alert("El precio debe ser un número positivo");
+  }
+
+  //CREAR EVENTO
+  try {
+    const body = {
+      ...nuevoEvento,
+    };
+    await axios.post(API_URL, body);
+    alert("Evento creado exitosamente");
+    setOpenModal(false);
+    fetchEventos();
+  } catch (error) {
+    console.error("Error creando evento", error);
+    alert("Ocurrió un error al crear el evento");
+  }
+};
+
+//ELIMINAR EVENTO (CREAR METODO DE SER NECESARIO)
   const handleEliminarEvento = async (id) => {
     if (confirm("¿Seguro que deseas eliminar este evento?")) {
       try {
@@ -81,6 +112,7 @@ const handleUpload = async (file) => {
   const formData = new FormData();
   formData.append("imagen", file);
 
+  // RUTA PARA SUBIR IMAGEN CLOUDINARY
   try {
     const res = await fetch("http://localhost:5000/upload", {
       method: "POST",

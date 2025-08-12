@@ -13,6 +13,8 @@ export function EntradasD() {
   const [loading, setLoading] = useState(true);
 
   const fetchEntradas = async () => {
+
+    //RUTA PARA OBTENER ENTRADAS
     try {
       const res = await fetch("http://localhost:3000/entradas"); 
       const data = await res.json();

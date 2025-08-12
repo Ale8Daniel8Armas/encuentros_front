@@ -18,15 +18,47 @@ const RegisterForm = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    if (
+      !form.nombres.trim() ||
+      !form.apellidos.trim() ||
+      !form.email.trim() ||
+      !form.password.trim()
+    ) {
+      return alert("Todos los campos son obligatorios");
+    }
+
+    const nameRegex = /^[a-zA-ZÁÉÍÓÚáéíóúñÑ\s]+$/;
+    if (!nameRegex.test(form.nombres) || !nameRegex.test(form.apellidos)) {
+      return alert(
+        "Los nombres y apellidos solo pueden contener letras y espacios"
+      );
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      return alert("Por favor ingresa un correo válido");
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(form.password)) {
+      return alert(
+        "La contraseña debe tener mínimo 8 caracteres, incluyendo mayúscula, minúscula, número y un carácter especial"
+      );
+    }
+
     if (form.password !== form.repeatPassword) {
       return alert("Las contraseñas no coinciden");
     }
 
+    {
+      /* RUTA DE USUARIOS PARA EL REGISTRO */
+    }
     try {
       await axios.post("http://localhost:3001/register", {
-        nombres: form.nombres,
-        apellidos: form.apellidos,
-        email: form.email,
+        nombres: form.nombres.trim(),
+        apellidos: form.apellidos.trim(),
+        email: form.email.trim(),
         password: form.password,
         role: "cliente",
       });

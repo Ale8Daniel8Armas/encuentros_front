@@ -9,6 +9,8 @@ const LoginForm = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    // RUTA PARA REALIZAR EL LOGIN
     try {
       const res = await axios.post("http://localhost:3001/login", {
         username,
@@ -16,7 +18,14 @@ const LoginForm = () => {
       });
 
       localStorage.setItem("token", res.data.token);
-      navigate("/homepage");
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      const role = res.data.user?.role?.toLowerCase();
+      if (role === "admin" || role === "administrador") {
+        navigate("/dashboardhome");
+      } else {
+        navigate("/homepage");
+      }
     } catch (err) {
       alert(
         "Error en el login: " + (err.response?.data?.message || err.message)
@@ -62,7 +71,6 @@ const LoginForm = () => {
           </div>
           <button
             type="submit"
-            onClick={() => navigate("/homepage")}
             className="bg-red-600 text-white py-2 rounded-full hover:bg-red-700 transition-colors"
           >
             Ingresar

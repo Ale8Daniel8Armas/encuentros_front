@@ -6,7 +6,6 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Obtenemos el carrito desde localStorage, o un arreglo vacío si no existe
   const getCartFromStorage = () => {
     const savedCart = localStorage.getItem("cart");
     return savedCart ? JSON.parse(savedCart) : [];
@@ -15,7 +14,8 @@ const Cart = () => {
   useEffect(() => {
     const cart = getCartFromStorage();
 
-    fetch("http://localhost:3002/api/eventos")
+    //RUTA PARA OBTENER EVENTOS Y ASOCIAR AL CARRITO
+    fetch("http://localhost:3002/eventos")
       .then((res) => res.json())
       .then((events) => {
         const items = cart.map(({ eventId, quantity }) => {
@@ -76,7 +76,6 @@ const Cart = () => {
   );
 
   const handleComprar = () => {
-    // Navega a la página de pago pasando el carrito como state
     navigate("/form", { state: { cartItems } });
   };
 
@@ -137,7 +136,6 @@ const Cart = () => {
           Subtotal: ${subtotal.toFixed(2)}
         </div>
 
-        {/* Botones */}
         <div className="flex flex-col sm:flex-row justify-between gap-4 pt-4">
           <Link to="/homepage">
             <button
@@ -148,8 +146,6 @@ const Cart = () => {
             </button>
           </Link>
           <div>
-            {/* listado de items */}
-
             {cartItems.length > 0 && (
               <button
                 onClick={handleComprar}

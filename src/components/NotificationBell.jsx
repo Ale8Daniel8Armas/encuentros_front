@@ -12,6 +12,7 @@ export default function NotificationBell() {
   const [openDialog, setOpenDialog] = useState(false);
   const [latestNotification, setLatestNotification] = useState(null);
 
+  //RUTA PARA RECIBIR Y MOSTRAR NOTIFICACIONES EN TIEMPO REAL
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:3003");
     ws.onmessage = (event) => {
@@ -25,7 +26,6 @@ export default function NotificationBell() {
 
   return (
     <div className="relative">
-      {/* Icono de campana */}
       <button
         onClick={() => setOpenDialog(true)}
         className="relative p-2 rounded-full hover:bg-gray-200"
@@ -38,7 +38,6 @@ export default function NotificationBell() {
         )}
       </button>
 
-      {/* Modal de notificación más reciente */}
       <Dialog open={openDialog} handler={setOpenDialog}>
         <DialogHeader>Notificación</DialogHeader>
         <DialogBody>

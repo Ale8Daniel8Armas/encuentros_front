@@ -7,8 +7,9 @@ const EventList = () => {
   const [loading, setLoading] = useState(true);
   const [visibleCount, setVisibleCount] = useState(6);
 
+  // RUTA PARA OBTENER LA LISTA DE EVENTOS CREADOS GET
   useEffect(() => {
-    fetch("http://localhost:3002/api/eventos")
+    fetch("http://localhost:3002/eventos")
       .then((res) => res.json())
       .then((data) => setEventos(data))
       .catch((err) => console.error(err))

@@ -7,21 +7,18 @@ const SearchResults = () => {
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Leer parámetros desde la URL
   const params = new URLSearchParams(location.search);
   const tipo = params.get("tipo");
-  const inicio = params.get("inicio");
-  const fin = params.get("fin");
+  const fecha = params.get("fecha");
 
   useEffect(() => {
     const fetchEventos = async () => {
       setLoading(true);
+      //RUTA DE OBTENCIÓN DE EVENTOS FILTRADOS EL GET CON LA LISTA ENTERA
       try {
-        // Aquí construimos la URL del backend con filtros
-        let url = "http://localhost:3002/api/eventos?";
+        let url = "http://localhost:3002/eventos?";
         if (tipo) url += `tipo=${encodeURIComponent(tipo)}&`;
-        if (inicio) url += `inicio=${encodeURIComponent(inicio)}&`;
-        if (fin) url += `fin=${encodeURIComponent(fin)}`;
+        if (fecha) url += `fecha=${encodeURIComponent(fecha)}`;
 
         const res = await fetch(url);
         if (!res.ok) throw new Error("Error al cargar eventos");
@@ -37,7 +34,7 @@ const SearchResults = () => {
     };
 
     fetchEventos();
-  }, [tipo, inicio, fin]);
+  }, [tipo, fecha]);
 
   return (
     <div className="px-4 py-6 max-w-7xl mx-auto mt-5">

@@ -2,17 +2,57 @@ import { useEffect, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import banner1 from "../assets/banner1.jpg";
 
-const images = [banner1, banner1, banner1];
-
 export default function MainHeader() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [images, setImages] = useState([banner1, banner1, banner1]);
+
+  useEffect(() => {
+    const fetchEventos = async () => {
+      //RUTA DE EVENTOS PARA OBTENER IMAGEN Y MOSTRAR EN EL SLIDER
+      try {
+        const res = await fetch("http://localhost:3002/eventos");
+        if (!res.ok) throw new Error("Error al obtener eventos");
+        const eventos = await res.json();
+
+        const eventosConImagen = eventos.filter(
+          (e) =>
+            e.imagen && typeof e.imagen === "string" && e.imagen.trim() !== ""
+        );
+
+        const seleccionados = [];
+        const indicesUsados = new Set();
+        const maxSeleccion = Math.min(3, eventosConImagen.length);
+
+        while (seleccionados.length < maxSeleccion) {
+          const randomIndex = Math.floor(
+            Math.random() * eventosConImagen.length
+          );
+          if (!indicesUsados.has(randomIndex)) {
+            indicesUsados.add(randomIndex);
+            seleccionados.push(eventosConImagen[randomIndex].imagen);
+          }
+        }
+
+        while (seleccionados.length < 3) {
+          seleccionados.push(banner1);
+        }
+
+        setImages(seleccionados);
+      } catch (error) {
+        setImages([banner1, banner1, banner1]);
+        console.error("Error cargando eventos:", error);
+      }
+    };
+
+    fetchEventos();
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       goToNext();
     }, 4000);
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, images]);
 
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) =>
@@ -32,7 +72,6 @@ export default function MainHeader() {
 
   return (
     <div className="relative w-full max-w-screen-auto mx-auto overflow-hidden">
-      {/* Slides */}
       <div
         className="flex transition-transform duration-700 ease-in-out"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}

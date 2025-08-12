@@ -9,8 +9,11 @@ const HistorialEntradas = ({ usuarioId }) => {
 
   useEffect(() => {
     const fetchEntradas = async () => {
+      //RUTA PARA OBTENER ENTRADAS POR USUARIO
       try {
-        const response = await axios.get(`/api/entradas/usuario/${usuarioId}`);
+        const response = await axios.get(
+          `http://localhost:3000/entradas/usuario/${usuarioId}`
+        );
         setEntradas(response.data);
       } catch (error) {
         console.error("Error al obtener el historial de entradas:", error);

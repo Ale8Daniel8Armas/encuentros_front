@@ -20,7 +20,6 @@ export function UsuariosD() {
       setUsers(res.data);
     } catch (err) {
       console.error("Error al listar usuarios:", err);
-      // opcional: mostrar toast/error UI
     } finally {
       setLoading(false);
     }

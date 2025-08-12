@@ -8,10 +8,9 @@ const FilterSearch = () => {
   const [fechaInicio, setFechaInicio] = useState("");
 
   const handleSearch = () => {
-    // Si hay parámetros, construir la query string
     const params = new URLSearchParams();
     if (tipoEvento) params.append("tipo", tipoEvento);
-    if (fechaInicio) params.append("inicio", fechaInicio);
+    if (fechaInicio) params.append("fecha", fechaInicio);
 
     navigate(`/buscar?${params.toString()}`);
   };
@@ -24,7 +23,6 @@ const FilterSearch = () => {
       }}
     >
       <div className="flex gap-10 flex-wrap justify-center">
-        {/* Tipo de evento */}
         <select
           value={tipoEvento}
           onChange={(e) => setTipoEvento(e.target.value)}
@@ -36,7 +34,6 @@ const FilterSearch = () => {
           <option value="civico-cultural">Cívico-cultural</option>
         </select>
 
-        {/* Fecha de inicio */}
         <input
           type="date"
           value={fechaInicio}
@@ -44,7 +41,6 @@ const FilterSearch = () => {
           className="bg-black text-white px-6 py-3 rounded-lg shadow-md hover:bg-gray-800 transition-all duration-300"
         />
 
-        {/* Botón buscar */}
         <button
           onClick={handleSearch}
           className="bg-red-600 text-white px-8 py-3 rounded-lg shadow-md hover:bg-red-700 transition-all duration-300"

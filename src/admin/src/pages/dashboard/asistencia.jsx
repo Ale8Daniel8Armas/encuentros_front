@@ -13,17 +13,21 @@ export function Asistencia() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Formulario
   const [eventoId, setEventoId] = useState("");
   const [usuarioId, setUsuarioId] = useState("");
   const [puerta, setPuerta] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
 
-  // Fetch asistencias
+  const validarEventoId = (id) => /^[a-zA-Z0-9\-]+$/.test(id); 
+  const validarUsuarioId = (id) => /^[a-zA-Z0-9\-]+$/.test(id);
+  const validarPuerta = (p) => /^[a-zA-Z0-9\-]+$/.test(p);
+
   const fetchAsistencias = async () => {
     setLoading(true);
     setError(null);
+
+    // RUTA PARA CARGAR ASISTENCIAS
     try {
       const res = await fetch("http://localhost:3004/asistencias");
       if (!res.ok) throw new Error("Error al cargar asistencias");
@@ -43,13 +47,28 @@ export function Asistencia() {
   // Registrar asistencia manual
   const handleRegistrar = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccessMsg("");
+
     if (!eventoId || !usuarioId || !puerta) {
       setError("Por favor, completa todos los campos.");
       return;
     }
+    if (!validarEventoId(eventoId)) {
+      setError("ID de evento inválido. Solo letras, números y guiones permitidos.");
+      return;
+    }
+    if (!validarUsuarioId(usuarioId)) {
+      setError("ID de usuario inválido. Solo letras, números y guiones permitidos.");
+      return;
+    }
+    if (!validarPuerta(puerta)) {
+      setError("Puerta inválida. Solo letras, números y guiones permitidos.");
+      return;
+    }
 
     setFormLoading(true);
-    setError(null);
+    //RUTA PARA CREAR ASISTENCIA (CREAR METODO EN EL BACKEND SI HACE FALTA)
     try {
       const res = await fetch("http://localhost:3004/asistencias", {
         method: "POST",
@@ -109,6 +128,11 @@ export function Asistencia() {
             {error && (
               <Typography color="red" variant="small" className="mt-2">
                 {error}
+              </Typography>
+            )}
+            {successMsg && (
+              <Typography color="green" variant="small" className="mt-2">
+                {successMsg}
               </Typography>
             )}
           </form>

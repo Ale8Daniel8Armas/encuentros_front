@@ -8,6 +8,15 @@ const PaymentPage = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [form, setForm] = useState({
+    name: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+    cardName: "",
+  });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,9 +29,13 @@ const PaymentPage = () => {
           return;
         }
 
+        {
+          /* RUTA DE OBTENER EVENTOS PARA LA COMPRA*/
+        }
+
         const responses = await Promise.all(
           ids.map((id) =>
-            fetch(`http://localhost:3002/api/eventos/${id}`).then((res) =>
+            fetch(`http://localhost:3002/eventos/${id}`).then((res) =>
               res.json()
             )
           )
@@ -59,18 +72,49 @@ const PaymentPage = () => {
   const iva = subtotal * 0.12;
   const total = subtotal + iva;
 
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!form.name.trim())
+      newErrors.name = "El nombre del titular es obligatorio";
+    if (!/^\d{16}$/.test(form.cardNumber))
+      newErrors.cardNumber = "El número de tarjeta debe tener 16 dígitos";
+    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(form.expiry))
+      newErrors.expiry = "Formato inválido. Use MM/YY";
+    if (!/^\d{3,4}$/.test(form.cvv))
+      newErrors.cvv = "El CVV debe tener 3 o 4 dígitos";
+    if (!form.cardName.trim())
+      newErrors.cardName = "El nombre en la tarjeta es obligatorio";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setProcessing(true);
 
     try {
       const usuarioId = localStorage.getItem("usuarioId");
+
+      if (!usuarioId) {
+        alert(
+          "Debes iniciar sesión o registrarte para continuar con la compra."
+        );
+        setProcessing(false);
+        return;
+      }
+
       if (!usuarioId) throw new Error("Usuario no autenticado");
 
-      // Crear una entrada por cada cantidad (si quantity > 1, crear varias)
       for (const item of cartItems) {
         for (let i = 0; i < item.quantity; i++) {
-          // Genera un asiento random o asignado (aquí ejemplo simple)
           const asiento = `Asiento-${Math.floor(Math.random() * 1000)}`;
 
           const body = {
@@ -79,7 +123,11 @@ const PaymentPage = () => {
             asiento,
           };
 
-          const response = await fetch("http://localhost:3002/api/entradas", {
+          {
+            /* RUTA PARA CREAR ENTRADA */
+          }
+
+          const response = await fetch("http://localhost:3000/entradas", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
@@ -131,7 +179,6 @@ const PaymentPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-2">
         <Link
           to="/homepage"
@@ -146,7 +193,6 @@ const PaymentPage = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Formulario pago */}
         <div>
           <h2 className="font-bold mb-4 text-2xl">Datos de pago</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -157,9 +203,15 @@ const PaymentPage = () => {
               </label>
               <input
                 type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
                 className="w-full border rounded-lg px-3 py-2"
                 placeholder="Ingrese el nombre del titular"
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm">{errors.name}</p>
+              )}
             </div>
 
             {/* Número de tarjeta */}
@@ -169,9 +221,15 @@ const PaymentPage = () => {
               </label>
               <input
                 type="text"
+                name="cardNumber"
+                value={form.cardNumber}
+                onChange={handleChange}
                 className="w-full border rounded-lg px-3 py-2"
                 placeholder="Ingrese el número de su tarjeta"
               />
+              {errors.cardNumber && (
+                <p className="text-red-500 text-sm">{errors.cardNumber}</p>
+              )}
             </div>
 
             {/* Expiry y CVV */}
@@ -182,17 +240,29 @@ const PaymentPage = () => {
                 </label>
                 <input
                   type="text"
+                  name="expiry"
+                  value={form.expiry}
+                  onChange={handleChange}
                   className="w-full border rounded-lg px-3 py-2"
                   placeholder="MM / YY"
                 />
+                {errors.expiry && (
+                  <p className="text-red-500 text-sm">{errors.expiry}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">CVV</label>
                 <input
                   type="text"
+                  name="cvv"
+                  value={form.cvv}
+                  onChange={handleChange}
                   className="w-full border rounded-lg px-3 py-2"
                   placeholder="XXX"
                 />
+                {errors.cvv && (
+                  <p className="text-red-500 text-sm">{errors.cvv}</p>
+                )}
               </div>
             </div>
 
@@ -203,9 +273,15 @@ const PaymentPage = () => {
               </label>
               <input
                 type="text"
+                name="cardName"
+                value={form.cardName}
+                onChange={handleChange}
                 className="w-full border rounded-lg px-3 py-2"
                 placeholder="Ingrese el nombre que aparece en la tarjeta"
               />
+              {errors.cardName && (
+                <p className="text-red-500 text-sm">{errors.cardName}</p>
+              )}
             </div>
 
             <button

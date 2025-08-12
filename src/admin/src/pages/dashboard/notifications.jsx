@@ -11,6 +11,7 @@ import { InformationCircleIcon } from "@heroicons/react/24/outline";
 export function Notificaciones() {
   const [notificaciones, setNotificaciones] = useState([]);
 
+  //RUTA PARA CARGAR NOTIFICACIONES EN EL DASHBOARD
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:3003");
     ws.onmessage = (event) => {
