@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base: tipografía y colores de texto por defecto */
+@layer base {
+  html, body {
+    @apply text-gray-900 bg-white;
+  }
+  ::selection {
+    @apply bg-black text-white;
+  }
+}
+
+/* Componentes reutilizables (para inputs/botones/cards/tablas) */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg border text-sm transition;
+  }
+  .btn-primary {
+    @apply btn bg-black text-white border-black hover:opacity-90;
+  }
+  .btn-outline {
+    @apply btn bg-transparent border-gray-300 hover:bg-black/5;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white border-red-600 hover:opacity-90;
+  }
+
+  .input {
+    @apply border rounded px-3 py-2 text-sm w-full;
+  }
+  .select {
+    @apply border rounded px-3 py-2 text-sm w-full;
+  }
+  .textarea {
+    @apply border rounded px-3 py-2 text-sm w-full resize-y leading-relaxed;
+  }
+
+  .card {
+    @apply border rounded-2xl p-4 shadow-sm bg-white;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-100 text-gray-800;
+  }
+
+  /* Tabla “legible” por defecto */
+  .table-wrap {
+    @apply border rounded-lg overflow-hidden;
+  }
+  .table-head {
+    @apply hidden md:grid bg-gray-50 text-[11px] uppercase tracking-wide text-gray-600 px-3 py-2;
+  }
+  .table-row {
+    @apply grid gap-3 items-center px-3 py-3 border-b last:border-none;
+  }
+}
+
+/* Pequeñas utilidades */
+@layer utilities {
+  .shadow-soft { @apply shadow-soft; }
+}
